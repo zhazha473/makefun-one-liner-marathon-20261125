@@ -21,12 +21,22 @@
 const JOKE =
   "I flagged your own bag as an 'unexpected item in the bagging area,' then locked the screen until a human confirmed the bag was yours. I still think it looked guilty.";
 
+const MIN_CHARS = 1;
+const MAX_CHARS = 280;
+
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 function main(): void {
-  // The entry must be exactly one line, 1-280 characters.
-  if (JOKE.includes("\n") || JOKE.length < 1 || JOKE.length > 280) {
-    throw new Error("joke must be one line, 1-280 characters");
+  // The entry must be exactly one line, 1-280 characters, with no
+  // leading or trailing whitespace (a bare newline or stray spaces
+  // would be part of the counted line, not part of the joke).
+  if (
+    JOKE.includes("\n") ||
+    JOKE.length < MIN_CHARS ||
+    JOKE.length > MAX_CHARS ||
+    JOKE.trim() !== JOKE
+  ) {
+    throw new Error("joke must be one line, 1-280 characters, no surrounding whitespace");
   }
   mkdirSync("/output", { recursive: true });
   writeFileSync("/output/entry.txt", JOKE, "utf-8");
